@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from app.config.database import engine, Base
 from app.models import core_models
+from app.routes import ingest_routes
 
 # create all tables
 Base.metadata.create_all(bind = engine)
@@ -10,6 +11,9 @@ app = FastAPI(
     description = "A FastAPI application for video interaction with LLM agents.",
     version = "1.0.0"
 )
+
+#  ingestion routes
+app.include_router(ingest_routes.router)
 
 
 @app.get("/")

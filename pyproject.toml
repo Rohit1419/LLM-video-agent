@@ -5,6 +5,7 @@ description = "interact with video LLM agent microservice"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
+    "asyncpg>=0.31.0",
     "fastapi[standard]>=0.124.4",
     "psycopg2-binary>=2.9.11",
     "python-dotenv>=1.2.1",
