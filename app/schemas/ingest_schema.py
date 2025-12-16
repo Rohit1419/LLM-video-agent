@@ -7,7 +7,7 @@ class VideoIngestRequest(BaseModel):
     video_id = str
     title : str
     transcript: str
-    mmeta_data : Dict[str, Any] = {}  # Optional metadata about the video
+    meta_data : Dict[str, Any] = {}  # Optional metadata about the video
 
 
 #Reasponse Schema 
