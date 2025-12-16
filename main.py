@@ -1,8 +1,9 @@
 from fastapi import FastAPI
-from dotenv import load_dotenv
+from app.config.database import engine, Base
+from app.models import core_models
 
-# load env variables from .env file
-load_dotenv()
+# create all tables
+Base.metadata.create_all(bind = engine)
 
 app = FastAPI(
     title = "Video Chat LLM agent",
