@@ -31,7 +31,7 @@ class Video(Base):
     transcript_text = Column(Text, nullable=False)
 
     # Metadata stored as JSON
-    meta_data = Column(JSON, nullable=True)
+    meta_data = Column(JSON, nullable=False)
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
