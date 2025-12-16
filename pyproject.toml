@@ -11,3 +11,8 @@ dependencies = [
     "sqlalchemy>=2.0.45",
     "uvicorn>=0.38.0",
 ]
+
+[dependency-groups]
+dev = [
+    "sqlalchemy2-stubs>=0.0.2a38",
+]
