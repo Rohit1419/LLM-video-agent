@@ -1,4 +1,13 @@
-from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, JSON, Boolean
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    Text,
+    ForeignKey,
+    DateTime,
+    JSON,
+    Boolean,
+)
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.config.database import Base
@@ -19,12 +28,11 @@ class Tenant(Base):
     videos = relationship("Video", back_populates="tenant")
 
 
-
 # Video Model
 class Video(Base):
     __tablename__ = "videos"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(String(255), primary_key=True, index=True)
     tenant_id = Column(Integer, ForeignKey("tenants.id"), index=True)
 
     title = Column(String(255), nullable=False)
@@ -36,4 +44,3 @@ class Video(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     tenant = relationship("Tenant", back_populates="videos")
-    
