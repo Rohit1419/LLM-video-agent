@@ -39,9 +39,11 @@ async def chat_with_video(db: AsyncSession, request: ChatRequest, api_key: str):
         )
 
     video = (
-        await db.execute(
-            select(Video).where(
-                Video.id == request.video_id, Video.tenant_id == tenant.id
+        (
+            await db.execute(
+                select(Video).where(
+                    Video.id == request.video_id, Video.tenant_id == tenant.id
+                )
             )
         )
         .scalars()

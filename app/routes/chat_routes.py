@@ -8,7 +8,7 @@ from app.controllers import chat_controller
 router = APIRouter(prefix="/api/v1/chat", tags=["Chat"])
 
 
-@router.post("/video", reponse_model=ChatResponse)
+@router.post("/video", response_model=ChatResponse)
 async def chat(
     request: ChatRequest,
     db: AsyncSession = Depends(get_db),

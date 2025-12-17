@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from app.config.database import engine, Base
-from app.routes import ingest_routes
+from app.routes import ingest_routes, chat_routes
 from contextlib import asynccontextmanager
 from app.models.core_models import Tenant
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -25,6 +25,9 @@ app = FastAPI(
 
 #  ingestion routes
 app.include_router(ingest_routes.router)
+
+# chat routes
+app.include_router(chat_routes.router)
 
 
 @app.get("/")

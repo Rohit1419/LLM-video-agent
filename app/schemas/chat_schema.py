@@ -6,7 +6,7 @@ class ChatRequest(BaseModel):
     video_id: str
     user_query: str
     timestamp: Optional[str] = "00:00"
-    model: Optional[str] = "gemini/gemini-2.0-flash-lite"
+    model: Optional[str] = "gemini/gemini-2.5-flash-lite"
 
 
 class ChatResponse(BaseModel):
