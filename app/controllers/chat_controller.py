@@ -11,11 +11,11 @@ You are a helpful teaching assistant for a video course.
 You are provided with the FULL TRANSCRIPT of the video below.
 
 CONTEXT:
-- Current Student Timestamp: {timestamp}
+- Current Student query : {user_query}
 
 INSTRUCTIONS:
 1. Answer the student's question based ONLY on the provided transcript.
-2. If the question is about the current scene, prioritize the text around timestamp {timestamp}.
+2. If the question is about the current scene, prioritize the text around 
 3. If the answer is not in the video, say "I cannot find that information in this video."
 4. Be concise and encouraging.
 
@@ -58,8 +58,8 @@ async def chat_with_video(db: AsyncSession, request: ChatRequest, api_key: str):
 
     # final system prompt
     final_system_prompt = SYSTEM_PROMPT_TEMPLATE.format(
-        timestamp=request.timestamp,
         transcript_text=video.transcript_text,
+        user_query=request.user_query,
     )
 
     messages = [
