@@ -43,8 +43,9 @@ async def create_test_user(db: AsyncSession = Depends(get_db)):
     try:
         await db.commit()
         return {"msg": "Created! Use API Key: test_key_123"}
-    except:
-        return {"msg": "User already exists or error"}
+    except Exception as e:
+        await db.rollback()
+        return {"msg": f"User already exists or error: {str(e)}"}
 
 
 if __name__ == "__main__":
