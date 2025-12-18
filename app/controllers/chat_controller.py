@@ -68,7 +68,7 @@ async def chat_with_video(db: AsyncSession, request: ChatRequest, api_key: str):
     #     {"role": "user", "content": request.user_query},
     # ]
 
-    history = await MemoryService.get_history(request.session_id)
+    history = await MemoryService.get_history(request.session_id, tenant.id)
 
     messages = [
         {
@@ -95,9 +95,13 @@ async def chat_with_video(db: AsyncSession, request: ChatRequest, api_key: str):
 
         # saving to redis memory
         # 1. user query
-        await MemoryService.add_message(request.session_id, "user", request.user_query)
+        await MemoryService.add_message(
+            tenant.id, request.session_id, "user", request.user_query
+        )
         # 2. LLM answer
-        await MemoryService.add_message(request.session_id, "assistant", answer_text)
+        await MemoryService.add_message(
+            tenant.id, request.session_id, "assistant", answer_text
+        )
 
         return {"answer": answer_text}
 
