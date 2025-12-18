@@ -5,6 +5,7 @@ from litellm import acompletion
 from app.models.core_models import Video, Tenant
 from app.schemas.chat_schema import ChatRequest
 import os
+from app.services.memory_service import MemoryService
 
 SYSTEM_PROMPT_TEMPLATE = """
 You are a helpful teaching assistant for a video course.
@@ -56,16 +57,31 @@ async def chat_with_video(db: AsyncSession, request: ChatRequest, api_key: str):
             detail="Video not found",
         )
 
-    # final system prompt
-    final_system_prompt = SYSTEM_PROMPT_TEMPLATE.format(
-        transcript_text=video.transcript_text,
-        user_query=request.user_query,
-    )
+    # # final system prompt
+    # final_system_prompt = SYSTEM_PROMPT_TEMPLATE.format(
+    #     transcript_text=video.transcript_text,
+    #     user_query=request.user_query,
+    # )
+
+    # messages = [
+    #     {"role": "system", "content": final_system_prompt},
+    #     {"role": "user", "content": request.user_query},
+    # ]
+
+    history = await MemoryService.get_history(request.session_id)
 
     messages = [
-        {"role": "system", "content": final_system_prompt},
-        {"role": "user", "content": request.user_query},
+        {
+            "role": "system",
+            "content": SYSTEM_PROMPT_TEMPLATE.format(
+                transcript_text=video.transcript_text
+            ),
+        }
     ]
+
+    messages.extend(history)
+
+    messages.append({"role": "user", "content": request.user_query})
 
     # LLM call
 
@@ -75,6 +91,14 @@ async def chat_with_video(db: AsyncSession, request: ChatRequest, api_key: str):
         )
 
         answer_text = response.choices[0].message.content
+        {"answer": answer_text}
+
+        # saving to redis memory
+        # 1. user query
+        await MemoryService.add_message(request.session_id, "user", request.user_query)
+        # 2. LLM answer
+        await MemoryService.add_message(request.session_id, "assistant", answer_text)
+
         return {"answer": answer_text}
 
     except Exception as e:
