@@ -6,7 +6,6 @@ from sqlalchemy import (
     ForeignKey,
     DateTime,
     JSON,
-    Boolean,
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func

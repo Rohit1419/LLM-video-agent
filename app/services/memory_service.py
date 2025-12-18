@@ -6,7 +6,7 @@ SESSION_TTL = 3600  # expirey after 1 hr
 
 class MemoryService:
     @staticmethod
-    async def get_history(session_id: str, tenant_id: str):
+    async def get_history(tenant_id: str, session_id: str):
         # now combining the tenant_id with session_id, which will not brake under same
         #  session id
         key = f"chat:{tenant_id}:{session_id}"
@@ -16,7 +16,7 @@ class MemoryService:
         return [json.loads(msg) for msg in history_json]
 
     @staticmethod
-    async def add_message(session_id: str, tenant_id: str, role: str, content: str):
+    async def add_message(tenant_id: str, session_id: str, role: str, content: str):
         key = f"chat:{tenant_id}:{session_id}"
         message = json.dumps({"role": role, "content": content})
 

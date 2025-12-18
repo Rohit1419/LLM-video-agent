@@ -2,6 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from fastapi import HTTPException, status
 from litellm import acompletion
+from litellm.exceptions import RateLimitError
 from app.models.core_models import Video, Tenant
 from app.schemas.chat_schema import ChatRequest
 import os
@@ -11,15 +12,12 @@ SYSTEM_PROMPT_TEMPLATE = """
 You are a helpful teaching assistant for a video course.
 You are provided with the FULL TRANSCRIPT of the video below.
 
-CONTEXT:
-- Current Student query : {user_query}
 
 INSTRUCTIONS:
-1. Answer the student's question based ONLY on the provided transcript.
-2. If the question is about the current scene, prioritize the text around 
-3. If the answer is not in the video, say "I cannot find that information in this video."
-4. Be concise and encouraging.
 
+1. you are assistence to know about the user and keep remember the previous chats
+2. you have to remember the user basic personal information, like name, age, etc. 
+4. always keep the answer as concise as possible
 TRANSCRIPT:
 {transcript_text}
 """
@@ -57,18 +55,10 @@ async def chat_with_video(db: AsyncSession, request: ChatRequest, api_key: str):
             detail="Video not found",
         )
 
-    # # final system prompt
-    # final_system_prompt = SYSTEM_PROMPT_TEMPLATE.format(
-    #     transcript_text=video.transcript_text,
-    #     user_query=request.user_query,
-    # )
-
-    # messages = [
-    #     {"role": "system", "content": final_system_prompt},
-    #     {"role": "user", "content": request.user_query},
-    # ]
-
-    history = await MemoryService.get_history(request.session_id, tenant.id)
+    history = await MemoryService.get_history(
+        tenant_id=tenant.id, session_id=request.session_id
+    )
+    print("Chat history:", history)
 
     messages = [
         {
@@ -87,23 +77,38 @@ async def chat_with_video(db: AsyncSession, request: ChatRequest, api_key: str):
 
     try:
         response = await acompletion(
-            model=request.model, messages=messages, api_key=os.getenv("GEMINI_API_KEY")
+            model=request.model,
+            messages=messages,
+            api_key=os.getenv("OPENAI_API_KEY"),
+            base_url="https://openrouter.ai/api/v1",
         )
 
         answer_text = response.choices[0].message.content
-        {"answer": answer_text}
 
         # saving to redis memory
         # 1. user query
         await MemoryService.add_message(
-            tenant.id, request.session_id, "user", request.user_query
+            tenant_id=tenant.id,
+            session_id=request.session_id,
+            role="user",
+            content=request.user_query,
         )
+
         # 2. LLM answer
         await MemoryService.add_message(
-            tenant.id, request.session_id, "assistant", answer_text
+            tenant_id=tenant.id,
+            session_id=request.session_id,
+            role="assistant",
+            content=answer_text,
         )
 
         return {"answer": answer_text}
+
+    except RateLimitError:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="AI quota exceeded. Please try again later.",
+        )
 
     except Exception as e:
         print(f"Error during LLM call: {str(e)}")

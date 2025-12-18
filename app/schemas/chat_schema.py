@@ -6,7 +6,7 @@ class ChatRequest(BaseModel):
     video_id: str
     session_id: str
     user_query: str
-    model: Optional[str] = "gemini/gemini-2.5-flash-lite"
+    model: Optional[str] = "openai/gpt-oss-120b:free"
 
 
 class ChatResponse(BaseModel):
