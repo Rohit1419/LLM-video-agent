@@ -79,8 +79,7 @@ async def chat_with_video(db: AsyncSession, request: ChatRequest, api_key: str):
         response = await acompletion(
             model=request.model,
             messages=messages,
-            api_key=os.getenv("OPENAI_API_KEY"),
-            base_url="https://openrouter.ai/api/v1",
+            api_key=os.getenv("GEMINI_API_KEY"),
         )
 
         answer_text = response.choices[0].message.content
