@@ -1,4 +1,4 @@
-# 📹 TexLink AI Video Chat Microservice
+#  Video Chat Microservice
 
 > A high-performance, async B2B microservice that enables "Chat with Video" capabilities for LMS platforms.
 > Built with **FastAPI**, **PostgreSQL (Async)**, **Redis**, and **LiteLLM**.
